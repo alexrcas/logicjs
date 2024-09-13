@@ -49,9 +49,10 @@ class LogicGate {
     }
 
     updateOutput() {
+        const data = {prev: this.s, s: this.calculateOutput()}
         this.s = this.calculateOutput();
         this.draw();
-        this.eventEmitter.emit(`gate:${this.id}:change`, this.s);
+        this.eventEmitter.emit(`gate:${this.id}:change`, data);
     }
 
     calculateOutput() {
@@ -127,8 +128,10 @@ class GateXOR extends LogicGate {
 class Wire {
 
     constructor(outputGate, inputGate, inputName, eventEmitter) {
-        eventEmitter.on(`gate:${outputGate.id}:change`, value => {
-            inputGate[inputName] = value;
+        eventEmitter.on(`gate:${outputGate.id}:change`, data => {
+            if (data.prev != data.s) {
+                inputGate[inputName] = data.s;
+            }
         });
 
         if (outputGate.output !== undefined) {
@@ -160,7 +163,7 @@ const gate1 = factory.gateAND();
 const gate2 = factory.gateOR();
 
 // Conectar la salida de gate1 a la entrada A de gate2
-const wire = factory.wire(gate1, gate2, 'a');
+const wire = factory.wire(gate1, gate2, 'b');
 
 gate1.draw();
 gate2.draw();
