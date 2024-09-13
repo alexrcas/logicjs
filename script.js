@@ -50,11 +50,16 @@ class LogicGate {
 
     updateOutput() {
         this.s = this.calculateOutput();
+        this.draw();
         this.eventEmitter.emit(`gate:${this.id}:change`, this.s);
     }
 
     calculateOutput() {
         throw new Error(`subclass does not override calculateOutput() method`)
+    }
+
+    draw() {
+        throw new Error(`subclass does not override draw() method`)
     }
 
 }
@@ -67,6 +72,16 @@ class GateAND extends LogicGate {
     calculateOutput() {
         return this._a && this._b;
     }
+
+    draw() {
+        let fragment = new DocumentFragment();
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <span>AND | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+        `;
+        fragment.append(div);
+        document.body.appendChild(fragment);
+    }
 }
 
 class GateOR extends LogicGate {
@@ -75,6 +90,16 @@ class GateOR extends LogicGate {
 
     calculateOutput() {
         return this._a || this._b;
+    }
+
+    draw() {
+        let fragment = new DocumentFragment();
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <span>OR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+        `;
+        fragment.append(div);
+        document.body.appendChild(fragment);
     }
 }
 
@@ -85,6 +110,16 @@ class GateXOR extends LogicGate {
 
     calculateOutput() {
         return this._a != this._b;
+    }
+
+    draw() {
+        let fragment = new DocumentFragment();
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <span>XOR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+        `;
+        fragment.append(div);
+        document.body.appendChild(fragment);
     }
 }
 
@@ -127,19 +162,13 @@ const gate2 = factory.gateOR();
 // Conectar la salida de gate1 a la entrada A de gate2
 const wire = factory.wire(gate1, gate2, 'a');
 
-
-console.log(gate1.s)
-console.log(gate2.s)
+gate1.draw();
+gate2.draw();
 
 setTimeout(() => {
-    console.log('cambiando input a ' + gate1.id)
     gate1.b = 1
-    console.log(gate1.s)
-    console.log(gate2.s)
 }, 3000)
 
 setTimeout(() => {
-    console.log('cambiando input a ' + gate2.id)
-    gate2.b = 1
-    console.log(gate2.s)
+    gate1.a = 1
 }, 6000)
