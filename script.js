@@ -49,7 +49,7 @@ class LogicGate {
     }
 
     updateOutput() {
-        const data = {prev: this.s, s: this.calculateOutput()}
+        const data = { prev: this.s, s: this.calculateOutput() }
         this.s = this.calculateOutput();
         this.draw();
         this.eventEmitter.emit(`gate:${this.id}:change`, data);
@@ -68,7 +68,7 @@ class LogicGate {
 
 class GateAND extends LogicGate {
 
-    constructor(eventEmitter) {super(eventEmitter)}
+    constructor(eventEmitter) { super(eventEmitter) }
 
     calculateOutput() {
         return this._a && this._b;
@@ -77,7 +77,7 @@ class GateAND extends LogicGate {
 
 class GateOR extends LogicGate {
 
-    constructor(eventEmitter) {super(eventEmitter)}
+    constructor(eventEmitter) { super(eventEmitter) }
 
     calculateOutput() {
         return this._a || this._b;
@@ -87,7 +87,7 @@ class GateOR extends LogicGate {
 
 class GateXOR extends LogicGate {
 
-    constructor(eventEmitter) {super(eventEmitter)}
+    constructor(eventEmitter) { super(eventEmitter) }
 
     calculateOutput() {
         return this._a != this._b;
@@ -96,56 +96,67 @@ class GateXOR extends LogicGate {
 
 
 class GUIGateAND extends GateAND {
-    
+
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
+        this.layer = layer;
+        this.gui = new Konva.Group({ draggable: true });
+        layer.add(this.gui);
     }
 
     draw() {
-        let fragment = new DocumentFragment();
-        let div = document.createElement('div');
-        div.innerHTML = `
-            <span>${this.id} | AND | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
-        `;
-        fragment.append(div);
-        document.body.appendChild(fragment);
+        this.arco = new Konva.Path({
+            x: this.x,
+            y: this.y,
+            data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
+            fill: 'blue',
+        });
+        this.gui.add(this.arco);
+        this.layer.draw();
     }
 
 }
 
 
 class GUIGateOR extends GateOR {
-    
+
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
+        this.layer = layer;
+        this.gui = new Konva.Group({ draggable: true });
+        layer.add(this.gui);
     }
 
     draw() {
-        let fragment = new DocumentFragment();
-        let div = document.createElement('div');
-        div.innerHTML = `
-            <span>${this.id} | OR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
-        `;
-        fragment.append(div);
-        document.body.appendChild(fragment);
+        this.arco = new Konva.Path({
+            x: this.x,
+            y: this.y,
+            data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
+            fill: 'red',
+        });
+        this.gui.add(this.arco);
+        this.layer.draw();
     }
 
 }
 
 class GUIGateXOR extends GateXOR {
-    
+
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
+        this.layer = layer;
+        this.gui = new Konva.Group({ draggable: true });
     }
 
     draw() {
-        let fragment = new DocumentFragment();
-        let div = document.createElement('div');
-        div.innerHTML = `
-            <span>${this.id} | XOR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
-        `;
-        fragment.append(div);
-        document.body.appendChild(fragment);
+        this.arco = new Konva.Path({
+            x: this.x,
+            y: this.y,
+            data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
+            fill: 'green',
+        });
+        this.gui.add(this.arco);
+        this.layer.draw();
     }
 
 }
@@ -169,21 +180,33 @@ class Wire {
 
 class GateFactory {
 
-    constructor() {
+    constructor(layer) {
+        this.layer = layer;
         this.eventEmitter = new EventEmitter();
     }
 
-    gateAND() { return new GUIGateAND(0, 0, null, this.eventEmitter) }
+    gateAND() { return new GUIGateAND(0, 0, layer, this.eventEmitter) }
 
-    gateOR() { return new GUIGateOR(0, 0, null, this.eventEmitter) }
+    gateOR() { return new GUIGateOR(0, 0, layer, this.eventEmitter) }
 
-    gateXOR() { return new GUIGateXOR(0, 0, null, this.eventEmitter) }
+    gateXOR() { return new GUIGateXOR(0, 0, layer, this.eventEmitter) }
 
     wire(outputGate, inputGate, inputName) { return new Wire(outputGate, inputGate, inputName, this.eventEmitter) }
 
 }
 
-factory = new GateFactory();
+const stage = new Konva.Stage({
+    container: 'canvas',
+    width: 500,
+    height: 400,
+});
+
+
+const layer = new Konva.Layer();
+stage.add(layer);
+
+
+factory = new GateFactory(layer);
 const gates = [];
 
 const gate1 = factory.gateAND();
