@@ -78,7 +78,7 @@ class GateAND extends LogicGate {
         let fragment = new DocumentFragment();
         let div = document.createElement('div');
         div.innerHTML = `
-            <span>AND | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+            <span>${this.id} | AND | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
         `;
         fragment.append(div);
         document.body.appendChild(fragment);
@@ -97,7 +97,7 @@ class GateOR extends LogicGate {
         let fragment = new DocumentFragment();
         let div = document.createElement('div');
         div.innerHTML = `
-            <span>OR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+            <span>${this.id} | OR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
         `;
         fragment.append(div);
         document.body.appendChild(fragment);
@@ -117,7 +117,7 @@ class GateXOR extends LogicGate {
         let fragment = new DocumentFragment();
         let div = document.createElement('div');
         div.innerHTML = `
-            <span>XOR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+            <span>${this.id} | XOR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
         `;
         fragment.append(div);
         document.body.appendChild(fragment);
@@ -158,9 +158,13 @@ class GateFactory {
 }
 
 factory = new GateFactory();
+const gates = [];
 
 const gate1 = factory.gateAND();
 const gate2 = factory.gateOR();
+
+gates.push(gate1);
+gates.push(gate2);
 
 // Conectar la salida de gate1 a la entrada A de gate2
 const wire = factory.wire(gate1, gate2, 'b');
@@ -168,10 +172,9 @@ const wire = factory.wire(gate1, gate2, 'b');
 gate1.draw();
 gate2.draw();
 
-setTimeout(() => {
-    gate1.b = 1
-}, 3000)
-
-setTimeout(() => {
-    gate1.a = 1
-}, 6000)
+document.querySelector('#send').addEventListener('click', () => {
+    const id = document.querySelector('#idinput').value;
+    const value = document.querySelector('#valueinput').value;
+    const inputname = document.querySelector('#inputname').value;
+    const gate = gates.filter(el => el.id == id)[0][inputname] = value
+})
