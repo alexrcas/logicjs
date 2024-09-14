@@ -73,16 +73,6 @@ class GateAND extends LogicGate {
     calculateOutput() {
         return this._a && this._b;
     }
-
-    draw() {
-        let fragment = new DocumentFragment();
-        let div = document.createElement('div');
-        div.innerHTML = `
-            <span>${this.id} | AND | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
-        `;
-        fragment.append(div);
-        document.body.appendChild(fragment);
-    }
 }
 
 class GateOR extends LogicGate {
@@ -91,16 +81,6 @@ class GateOR extends LogicGate {
 
     calculateOutput() {
         return this._a || this._b;
-    }
-
-    draw() {
-        let fragment = new DocumentFragment();
-        let div = document.createElement('div');
-        div.innerHTML = `
-            <span>${this.id} | OR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
-        `;
-        fragment.append(div);
-        document.body.appendChild(fragment);
     }
 }
 
@@ -112,6 +92,51 @@ class GateXOR extends LogicGate {
     calculateOutput() {
         return this._a != this._b;
     }
+}
+
+
+class GUIGateAND extends GateAND {
+    
+    constructor(x, y, layer, eventEmitter) {
+        super(eventEmitter);
+    }
+
+    draw() {
+        let fragment = new DocumentFragment();
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <span>${this.id} | AND | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+        `;
+        fragment.append(div);
+        document.body.appendChild(fragment);
+    }
+
+}
+
+
+class GUIGateOR extends GateOR {
+    
+    constructor(x, y, layer, eventEmitter) {
+        super(eventEmitter);
+    }
+
+    draw() {
+        let fragment = new DocumentFragment();
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <span>${this.id} | OR | A: ${this._a}, B: ${this._b} | S: ${this.s}</span>
+        `;
+        fragment.append(div);
+        document.body.appendChild(fragment);
+    }
+
+}
+
+class GUIGateXOR extends GateXOR {
+    
+    constructor(x, y, layer, eventEmitter) {
+        super(eventEmitter);
+    }
 
     draw() {
         let fragment = new DocumentFragment();
@@ -122,6 +147,7 @@ class GateXOR extends LogicGate {
         fragment.append(div);
         document.body.appendChild(fragment);
     }
+
 }
 
 
@@ -147,11 +173,11 @@ class GateFactory {
         this.eventEmitter = new EventEmitter();
     }
 
-    gateAND() { return new GateAND(this.eventEmitter) }
+    gateAND() { return new GUIGateAND(0, 0, null, this.eventEmitter) }
 
-    gateOR() { return new GateOR(this.eventEmitter) }
+    gateOR() { return new GUIGateOR(0, 0, null, this.eventEmitter) }
 
-    gateXOR() { return new GateXOR(this.eventEmitter) }
+    gateXOR() { return new GUIGateXOR(0, 0, null, this.eventEmitter) }
 
     wire(outputGate, inputGate, inputName) { return new Wire(outputGate, inputGate, inputName, this.eventEmitter) }
 
