@@ -51,17 +51,10 @@ class LogicGate {
     updateOutput() {
         const data = { prev: this.s, s: this.calculateOutput() }
         this.s = this.calculateOutput();
-        this.draw();
+        this.updateDraw();
         this.eventEmitter.emit(`gate:${this.id}:change`, data);
     }
 
-    calculateOutput() {
-        throw new Error(`subclass does not override calculateOutput() method`)
-    }
-
-    draw() {
-        throw new Error(`subclass does not override draw() method`)
-    }
 
 }
 
@@ -99,19 +92,59 @@ class GUIGateAND extends GateAND {
 
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
+        this.x = x;
+        this.y = y;
         this.layer = layer;
         this.gui = new Konva.Group({ draggable: true });
         layer.add(this.gui);
+        this.draw();
     }
 
     draw() {
+
         this.arco = new Konva.Path({
             x: this.x,
             y: this.y,
             data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
             fill: 'blue',
         });
+
         this.gui.add(this.arco);
+
+        const simpleLabel = new Konva.Label({
+            x: 0,
+            y: 0,
+            opacity: 0.75,
+          });
+    
+          simpleLabel.add(
+            new Konva.Tag({
+              fill: 'yellow',
+            })
+          );
+
+          this.text = new Konva.Text({
+            text: `${this.id} (AND)| A: ${this._a}, B: ${this._b} | S: ${this.s}`,
+            fontFamily: 'Calibri',
+            fontSize: 18,
+            padding: 5,
+            fill: 'black',
+          });
+    
+          simpleLabel.add(this.text)
+
+        this.gui.add(simpleLabel)
+        this.layer.draw();
+    }
+
+    updateDraw() {
+        if (this.s == 0) {
+            this.arco.fill('blue');
+        } else {
+            this.arco.fill('green');
+        }
+        this.text.text(`${this.id} (AND)| A: ${this._a}, B: ${this._b} | S: ${this.s}`);
+        
         this.layer.draw();
     }
 
@@ -122,40 +155,60 @@ class GUIGateOR extends GateOR {
 
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
+        this.x = x;
+        this.y = y;
         this.layer = layer;
         this.gui = new Konva.Group({ draggable: true });
         layer.add(this.gui);
+        this.draw();
     }
 
     draw() {
+
         this.arco = new Konva.Path({
             x: this.x,
             y: this.y,
             data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
-            fill: 'red',
+            fill: 'blue',
         });
+
         this.gui.add(this.arco);
+
+        const simpleLabel = new Konva.Label({
+            x: 0,
+            y: 0,
+            opacity: 0.75,
+          });
+    
+          simpleLabel.add(
+            new Konva.Tag({
+              fill: 'yellow',
+            })
+          );
+    
+          this.text = new Konva.Text({
+            text: `${this.id} (OR)| A: ${this._a}, B: ${this._b} | S: ${this.s}`,
+            fontFamily: 'Calibri',
+            fontSize: 18,
+            padding: 5,
+            fill: 'black',
+          });
+    
+          simpleLabel.add(this.text)
+
+        this.gui.add(simpleLabel);
+
         this.layer.draw();
     }
 
-}
-
-class GUIGateXOR extends GateXOR {
-
-    constructor(x, y, layer, eventEmitter) {
-        super(eventEmitter);
-        this.layer = layer;
-        this.gui = new Konva.Group({ draggable: true });
-    }
-
-    draw() {
-        this.arco = new Konva.Path({
-            x: this.x,
-            y: this.y,
-            data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
-            fill: 'green',
-        });
-        this.gui.add(this.arco);
+    updateDraw() {
+        if (this.s == 0) {
+            this.arco.fill('blue');
+        } else {
+            this.arco.fill('green');
+        }
+        this.text.text(`${this.id} (OR)| A: ${this._a}, B: ${this._b} | S: ${this.s}`);
+        
         this.layer.draw();
     }
 
@@ -189,8 +242,6 @@ class GateFactory {
 
     gateOR() { return new GUIGateOR(0, 0, layer, this.eventEmitter) }
 
-    gateXOR() { return new GUIGateXOR(0, 0, layer, this.eventEmitter) }
-
     wire(outputGate, inputGate, inputName) { return new Wire(outputGate, inputGate, inputName, this.eventEmitter) }
 
 }
@@ -216,10 +267,8 @@ gates.push(gate1);
 gates.push(gate2);
 
 // Conectar la salida de gate1 a la entrada A de gate2
-const wire = factory.wire(gate1, gate2, 'b');
+const wire = factory.wire(gate1, gate2, 'a');
 
-gate1.draw();
-gate2.draw();
 
 document.querySelector('#send').addEventListener('click', () => {
     const id = document.querySelector('#idinput').value;
