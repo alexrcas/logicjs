@@ -88,6 +88,107 @@ class LogicGateXOR extends LogicGate {
 }
 
 
+
+class GUIManager {
+
+    constructor(layer, figure) {
+        this.layer = layer;
+        this.figure = figure;
+        this.group = new Konva.Group({ draggable: true });
+        this.group.add(this.figure);
+        this.layer.add(this.group);
+        this.GRID_SIZE = 10;
+
+        this.group.on('dragmove', () => {
+            let absPos = this.group.getAbsolutePosition();
+            absPos.x = this.snapToGrid(absPos.x);
+            absPos.y = this.snapToGrid(absPos.y);
+            this.group.setAbsolutePosition(absPos);
+            layer.draw();
+          });
+
+          this.guiS = new Konva.Circle({
+            x: 50,
+            y: 20,
+            radius: 5,
+            fill: 'red',
+          });
+
+        this.group.add(this.guiS);
+
+
+        let line;
+        let points = [];
+        let drawing = false;
+        let lastPoint;
+
+        this.guiS.on('click', (e) => {
+            drawing = true;
+            points = [this.guiS.getAbsolutePosition().x, this.guiS.getAbsolutePosition().y]; // Comenzar en el primer círculo
+            lastPoint = { x: this.guiS.getAbsolutePosition().x, y: this.guiS.getAbsolutePosition().y };
+            
+            // Crear la línea
+            line = new Konva.Line({
+              points: points,
+              stroke: 'blue',
+              strokeWidth: 2,
+              lineJoin: 'round',
+            });
+            layer.add(line);
+            layer.draw();
+        });
+
+
+          this.layer.getStage().on('click', (e) => {
+            if (!drawing) return;
+          
+            const pos = stage.getPointerPosition();
+            const x = pos.x;
+            const y = pos.y;
+          
+            if (Math.abs(x - lastPoint.x) > Math.abs(y - lastPoint.y)) {
+              points.push(x, lastPoint.y);
+              lastPoint.x = x;
+            } else {
+              points.push(lastPoint.x, y);
+              lastPoint.y = y;
+            }
+          
+            line.points(points);
+            layer.draw();
+        });
+
+
+        this.layer.getStage().on('mousemove', (e) => {
+            if (!drawing) return;
+          
+            const pos = stage.getPointerPosition();
+            const x = this.snapToGrid(pos.x, this.gridSize);
+            const y = this.snapToGrid(pos.y, this.gridSize);
+          
+            let previewPoints = [...points];
+          
+            if (Math.abs(x - lastPoint.x) > Math.abs(y - lastPoint.y)) {
+              previewPoints.push(x, lastPoint.y);
+            } else {
+              previewPoints.push(lastPoint.x, y);
+            }
+          
+            line.points(previewPoints);
+            layer.draw();
+          });
+
+    }
+
+
+    snapToGrid(value) {
+        return Math.round(value / this.GRID_SIZE) * this.GRID_SIZE;
+    }
+
+
+}
+
+
 class GUIGateAND extends LogicGateAND {
 
     constructor(x, y, layer, eventEmitter) {
@@ -95,38 +196,23 @@ class GUIGateAND extends LogicGateAND {
         this.x = x;
         this.y = y;
         this.layer = layer;
-        this.gui = new Konva.Group({ draggable: true });
-        layer.add(this.gui);
-        this.draw();
-    }
-
-    draw() {
-
-        this.arco = new Konva.Path({
+        
+        const figure = new GUIManager(layer, new Konva.Path({
             x: this.x,
             y: this.y,
             data: 'M 0 0 L 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0',
             fill: 'blue',
-        });
+        }));
 
-        this.gui.add(this.arco);
 
-        this.inputA = new Konva.Circle({
-            x: this.x,
-            y: 10,
-            radius: 5,
-            fill: 'red',
-          });
 
-          this.inputB = new Konva.Circle({
-            x: this.x,
-            y: 30,
-            radius: 5,
-            fill: 'red',
-          });
+        this.GUIManager = figure;
 
-        this.gui.add(this.inputA)
-        this.gui.add(this.inputB)
+    }
+
+
+    /*
+    draw() {
 
         const simpleLabel = new Konva.Label({
             x: -40,
@@ -152,7 +238,7 @@ class GUIGateAND extends LogicGateAND {
 
         this.gui.add(simpleLabel)
         this.layer.draw();
-    }
+    }*/
 
     updateDraw() {
         if (this.s == 0) {
