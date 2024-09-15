@@ -105,15 +105,32 @@ class GUIGateAND extends LogicGateAND {
         this.arco = new Konva.Path({
             x: this.x,
             y: this.y,
-            data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
+            data: 'M 0 0 L 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0',
             fill: 'blue',
         });
 
         this.gui.add(this.arco);
 
+        this.inputA = new Konva.Circle({
+            x: this.x,
+            y: 10,
+            radius: 5,
+            fill: 'red',
+          });
+
+          this.inputB = new Konva.Circle({
+            x: this.x,
+            y: 30,
+            radius: 5,
+            fill: 'red',
+          });
+
+        this.gui.add(this.inputA)
+        this.gui.add(this.inputB)
+
         const simpleLabel = new Konva.Label({
-            x: 0,
-            y: 0,
+            x: -40,
+            y: -40,
             opacity: 0.75,
           });
     
@@ -168,15 +185,15 @@ class GUIGateOR extends LogicGateOR {
         this.arco = new Konva.Path({
             x: this.x,
             y: this.y,
-            data: 'M 25 60 A 5 5 90 0 0 25 0 H 0 V 60 H 25',
+            data: 'M 0 0 Q 25 16 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0',
             fill: 'blue',
         });
 
         this.gui.add(this.arco);
 
         const simpleLabel = new Konva.Label({
-            x: 0,
-            y: 0,
+            x: -40,
+            y: -40,
             opacity: 0.75,
           });
     
