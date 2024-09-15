@@ -59,7 +59,7 @@ class LogicGate {
 }
 
 
-class GateAND extends LogicGate {
+class LogicGateAND extends LogicGate {
 
     constructor(eventEmitter) { super(eventEmitter) }
 
@@ -68,7 +68,7 @@ class GateAND extends LogicGate {
     }
 }
 
-class GateOR extends LogicGate {
+class LogicGateOR extends LogicGate {
 
     constructor(eventEmitter) { super(eventEmitter) }
 
@@ -78,7 +78,7 @@ class GateOR extends LogicGate {
 }
 
 
-class GateXOR extends LogicGate {
+class LogicGateXOR extends LogicGate {
 
     constructor(eventEmitter) { super(eventEmitter) }
 
@@ -88,7 +88,7 @@ class GateXOR extends LogicGate {
 }
 
 
-class GUIGateAND extends GateAND {
+class GUIGateAND extends LogicGateAND {
 
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
@@ -151,7 +151,7 @@ class GUIGateAND extends GateAND {
 }
 
 
-class GUIGateOR extends GateOR {
+class GUIGateOR extends LogicGateOR {
 
     constructor(x, y, layer, eventEmitter) {
         super(eventEmitter);
