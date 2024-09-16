@@ -91,11 +91,14 @@ class LogicGateXOR extends LogicGate {
 
 class GUIManager {
 
-    constructor(layer, figure) {
+    static lastClickedInstance = null;
+
+    constructor(layer, figure, gate) {
+        this.gate = gate;
         this.layer = layer;
         this.figure = figure;
-        this.group = new Konva.Group({ draggable: true });
-        this.group.add(this.figure);
+        this.group = new Konva.Group({draggable: true})
+        this.group.add(this.figure)
         this.layer.add(this.group);
         this.GRID_SIZE = 10;
 
@@ -110,7 +113,7 @@ class GUIManager {
           this.guiS = new Konva.Circle({
             x: 50,
             y: 20,
-            radius: 5,
+            radius: 10,
             fill: 'red',
           });
 
@@ -123,6 +126,11 @@ class GUIManager {
         let lastPoint;
 
         this.guiS.on('click', (e) => {
+            if (drawing == true) {
+                return;
+            }
+
+            GUIManager.lastClickedInstance = this;
             drawing = true;
             points = [this.guiS.getAbsolutePosition().x, this.guiS.getAbsolutePosition().y]; // Comenzar en el primer círculo
             lastPoint = { x: this.guiS.getAbsolutePosition().x, y: this.guiS.getAbsolutePosition().y };
@@ -137,6 +145,13 @@ class GUIManager {
             layer.add(line);
             layer.draw();
         });
+
+        this.figure.on('click', (e) => {
+            console.log(this.gate.id)
+            const origin = GUIManager.lastClickedInstance.gate;
+            const target = this.gate;
+            new Wire(origin, target, 'a', origin.eventEmitter)
+        })
 
 
           this.layer.getStage().on('click', (e) => {
@@ -197,57 +212,24 @@ class GUIGateAND extends LogicGateAND {
         this.y = y;
         this.layer = layer;
         
-        const figure = new GUIManager(layer, new Konva.Path({
+        const figure = new Konva.Path({
             x: this.x,
             y: this.y,
             data: 'M 0 0 L 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0',
             fill: 'blue',
-        }));
+        });
 
-
-
-        this.GUIManager = figure;
+          this.GUIManager = new GUIManager(this.layer, figure, this);
 
     }
 
 
-    /*
-    draw() {
-
-        const simpleLabel = new Konva.Label({
-            x: -40,
-            y: -40,
-            opacity: 0.75,
-          });
-    
-          simpleLabel.add(
-            new Konva.Tag({
-              fill: 'yellow',
-            })
-          );
-
-          this.text = new Konva.Text({
-            text: `${this.id} (AND)| A: ${this._a}, B: ${this._b} | S: ${this.s}`,
-            fontFamily: 'Calibri',
-            fontSize: 18,
-            padding: 5,
-            fill: 'black',
-          });
-    
-          simpleLabel.add(this.text)
-
-        this.gui.add(simpleLabel)
-        this.layer.draw();
-    }*/
-
     updateDraw() {
         if (this.s == 0) {
-            this.arco.fill('blue');
+            this.GUIManager.figure.fill('blue');
         } else {
-            this.arco.fill('green');
+            this.GUIManager.figure.fill('green');
         }
-        this.text.text(`${this.id} (AND)| A: ${this._a}, B: ${this._b} | S: ${this.s}`);
-        
         this.layer.draw();
     }
 
@@ -261,57 +243,24 @@ class GUIGateOR extends LogicGateOR {
         this.x = x;
         this.y = y;
         this.layer = layer;
-        this.gui = new Konva.Group({ draggable: true });
-        layer.add(this.gui);
-        this.draw();
-    }
-
-    draw() {
-
-        this.arco = new Konva.Path({
+        
+        const figure = new Konva.Path({
             x: this.x,
             y: this.y,
             data: 'M 0 0 Q 25 16 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0',
             fill: 'blue',
         });
 
-        this.gui.add(this.arco);
-
-        const simpleLabel = new Konva.Label({
-            x: -40,
-            y: -40,
-            opacity: 0.75,
-          });
-    
-          simpleLabel.add(
-            new Konva.Tag({
-              fill: 'yellow',
-            })
-          );
-    
-          this.text = new Konva.Text({
-            text: `${this.id} (OR)| A: ${this._a}, B: ${this._b} | S: ${this.s}`,
-            fontFamily: 'Calibri',
-            fontSize: 18,
-            padding: 5,
-            fill: 'black',
-          });
-    
-          simpleLabel.add(this.text)
-
-        this.gui.add(simpleLabel);
-
-        this.layer.draw();
+          this.GUIManager = new GUIManager(this.layer, figure, this);
     }
+
 
     updateDraw() {
         if (this.s == 0) {
-            this.arco.fill('blue');
+            this.GUIManager.figure.fill('blue');
         } else {
-            this.arco.fill('green');
+            this.GUIManager.figure.fill('green');
         }
-        this.text.text(`${this.id} (OR)| A: ${this._a}, B: ${this._b} | S: ${this.s}`);
-        
         this.layer.draw();
     }
 
@@ -321,14 +270,15 @@ class GUIGateOR extends LogicGateOR {
 class Wire {
 
     constructor(outputGate, inputGate, inputName, eventEmitter) {
+        console.log(outputGate, inputGate)
         eventEmitter.on(`gate:${outputGate.id}:change`, data => {
             if (data.prev != data.s) {
                 inputGate[inputName] = data.s;
             }
         });
 
-        if (outputGate.output !== undefined) {
-            inputGate[inputName] = outputGate.output;
+        if (outputGate.s !== undefined) {
+            inputGate[inputName] = outputGate.s;
         }
     }
 }
@@ -370,7 +320,7 @@ gates.push(gate1);
 gates.push(gate2);
 
 // Conectar la salida de gate1 a la entrada A de gate2
-const wire = factory.wire(gate1, gate2, 'a');
+//const wire = factory.wire(gate1, gate2, 'a');
 
 
 document.querySelector('#send').addEventListener('click', () => {
