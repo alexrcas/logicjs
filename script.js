@@ -112,7 +112,26 @@ class GUIManager {
             layer.draw();
           });
 
-          this.guiS = new Konva.Circle({
+          this.guiA = new Konva.Circle({
+            x: 0,
+            y: 10,
+            radius: 4,
+            fill: 'red',
+          });
+
+
+          this.guiB = new Konva.Circle({
+            x: 0,
+            y: 30,
+            radius: 4,
+            fill: 'red',
+          });
+
+        this.group.add(this.guiA);
+        this.group.add(this.guiB);
+
+
+        this.guiS = new Konva.Circle({
             x: 50,
             y: 20,
             radius: 4,
@@ -125,6 +144,8 @@ class GUIManager {
         let line;
         let points = [];
         let lastPoint;
+
+        this.figure.on('click', e => console.log(this.gate.id))
 
         this.guiS.on('click', (e) => {
             if (this.drawing == true) {
@@ -148,13 +169,36 @@ class GUIManager {
         });
 
         //para pruebas pero será al hacer click en las entradas
-        this.figure.on('click', (e) => {
+        this.guiA.on('click', (e) => {
+            if (!GUIManager.lastClickedInstance) {
+                return;
+            }
 
+            if (!GUIManager.lastClickedInstance.drawing) {
+                return;
+            }
+            console.log('click')
             GUIManager.lastClickedInstance.drawing = false
             const origin = GUIManager.lastClickedInstance.gate;
             const target = this.gate;
             new Wire(origin, target, 'a', origin.eventEmitter)
+
+        })
+
+        this.guiB.on('click', (e) => {
+            if (!GUIManager.lastClickedInstance) {
+                return;
+            }
             
+            if (!GUIManager.lastClickedInstance.drawing) {
+                return;
+            }
+            console.log('click')
+            GUIManager.lastClickedInstance.drawing = false
+            const origin = GUIManager.lastClickedInstance.gate;
+            const target = this.gate;
+            new Wire(origin, target, 'b', origin.eventEmitter)
+
         })
 
 
@@ -274,7 +318,7 @@ class GUIGateOR extends LogicGateOR {
 class Wire {
 
     constructor(outputGate, inputGate, inputName, eventEmitter) {
-        console.log(outputGate, inputGate)
+        console.log(outputGate, inputGate, inputName)
         eventEmitter.on(`gate:${outputGate.id}:change`, data => {
             if (data.prev != data.s) {
                 inputGate[inputName] = data.s;
@@ -319,9 +363,14 @@ const gates = [];
 
 const gate1 = factory.gateAND();
 const gate2 = factory.gateOR();
+const gate3 = factory.gateAND();
+const gate4 = factory.gateOR();
+
 
 gates.push(gate1);
 gates.push(gate2);
+gates.push(gate3);
+gates.push(gate4);
 
 // Conectar la salida de gate1 a la entrada A de gate2
 //const wire = factory.wire(gate1, gate2, 'a');
