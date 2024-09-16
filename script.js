@@ -102,6 +102,8 @@ class GUIManager {
         this.layer.add(this.group);
         this.GRID_SIZE = 10;
 
+        this.drawing = false;
+
         this.group.on('dragmove', () => {
             let absPos = this.group.getAbsolutePosition();
             absPos.x = this.snapToGrid(absPos.x);
@@ -113,7 +115,7 @@ class GUIManager {
           this.guiS = new Konva.Circle({
             x: 50,
             y: 20,
-            radius: 10,
+            radius: 4,
             fill: 'red',
           });
 
@@ -122,16 +124,15 @@ class GUIManager {
 
         let line;
         let points = [];
-        let drawing = false;
         let lastPoint;
 
         this.guiS.on('click', (e) => {
-            if (drawing == true) {
+            if (this.drawing == true) {
                 return;
             }
 
             GUIManager.lastClickedInstance = this;
-            drawing = true;
+            this.drawing = true;
             points = [this.guiS.getAbsolutePosition().x, this.guiS.getAbsolutePosition().y]; // Comenzar en el primer círculo
             lastPoint = { x: this.guiS.getAbsolutePosition().x, y: this.guiS.getAbsolutePosition().y };
             
@@ -146,16 +147,19 @@ class GUIManager {
             layer.draw();
         });
 
+        //para pruebas pero será al hacer click en las entradas
         this.figure.on('click', (e) => {
-            console.log(this.gate.id)
+
+            GUIManager.lastClickedInstance.drawing = false
             const origin = GUIManager.lastClickedInstance.gate;
             const target = this.gate;
             new Wire(origin, target, 'a', origin.eventEmitter)
+            
         })
 
 
           this.layer.getStage().on('click', (e) => {
-            if (!drawing) return;
+            if (!this.drawing) return;
           
             const pos = stage.getPointerPosition();
             const x = pos.x;
@@ -175,7 +179,7 @@ class GUIManager {
 
 
         this.layer.getStage().on('mousemove', (e) => {
-            if (!drawing) return;
+            if (!this.drawing) return;
           
             const pos = stage.getPointerPosition();
             const x = this.snapToGrid(pos.x, this.gridSize);
