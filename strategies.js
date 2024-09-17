@@ -87,8 +87,8 @@ const addSwitchInterfaceStrategy = element => {
         // Crear la línea
         line = new Konva.Line({
             points: points,
-            stroke: 'blue',
-            strokeWidth: 2,
+            stroke: '#264653',
+            strokeWidth: 1,
             lineJoin: 'round',
         });
         layer.add(line);
@@ -221,8 +221,8 @@ const addDoubleGateInterfaceStrategy = element => {
         // Crear la línea
         line = new Konva.Line({
             points: points,
-            stroke: 'blue',
-            strokeWidth: 2,
+            stroke: '#264653',
+            strokeWidth: 1,
             lineJoin: 'round',
         });
         layer.add(line);

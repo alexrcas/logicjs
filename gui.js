@@ -177,7 +177,7 @@ class GUIGateXOR extends LogicGateXOR {
         const figure = new Konva.Path({
             x: this.x,
             y: this.y,
-            data: 'M 0 0 Q 25 16 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0',
+            data: 'M 0 0 Q 25 16 0 40 L 30 40 A 2 2 90 0 0 30 0 L 0 0 Q 20 16 0 40 Q 13 16 0 0',
             fill: GUIManager.offColor,
         });
 
