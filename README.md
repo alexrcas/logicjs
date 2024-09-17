@@ -17,9 +17,15 @@ Hacer click en los diferentes botones para instanciar el componente correspondie
 
 ## Ejemplo
 
-En la imagen siguiente se muestra un circuito sumador que suma dos números de A y B, de 3 bits. Estos números se representan por interruptores activados o desactivados. En este caso, el operando A es *010 (2 en decimal)* y el operando B es *011 (3 en decimal)*. El resultado de la suma de ambos es *5 (101 en binario)* como efectivamente representan los leds conectados a la salida del circuito sumador. El led situado en la parte inferior corresponde al bit de *carry out*.
+En la imagen siguiente se muestra un circuito sumador que suma dos números de A y B, de 3 bits. Estos números se representan por interruptores activados o desactivados. En este caso, el operando A es *010 (2 en decimal)* y el operando B es *011 (3 en decimal)*. El resultado de la suma de ambos es *5 (101 en binario)* como efectivamente representan los leds conectados a la salida del circuito sumador.
 
-![](/doc/adder.png)
+![](/doc/suma.png)
+
+El siguiente es un ejemplo de un caso de desbordamiento. Al comienzo se suman los números *A = 101 (5)* y *B = 010 (2)*, dando como resultado *2 + 5 = 7 (111)* como reflejan todos los leds encendidos y siendo el número máximo que se puede representar con 3 bits.
+
+Acto seguido se activa un bit en el operando B convirtiéndolo en *011 (3)* y quedando la suma como *5 + 3 = 8*. El 8 no puede representarse con solo 3 bits y produce un overflow, lo cual se refleja en la activación del led inferior, también conocido como *carry out*
+
+![](/doc/overflow.gif)
 
 
 ## Diagrama de clases
