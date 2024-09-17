@@ -35,6 +35,7 @@ class GUIManager {
         }
         
         addDoubleGateInterfaceStrategy(this);
+
     }
 
     snapToGrid(value) {

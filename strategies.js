@@ -95,6 +95,17 @@ const addSwitchInterfaceStrategy = element => {
         layer.draw();
     });
 
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && element.drawing) {
+            // Cancelar el dibujo de la línea
+            element.drawing = false;
+            if (line) {
+                line.destroy();  // Eliminar la línea de la capa
+                layer.draw();    // Redibujar la capa
+            }
+        }
+    });
+
 
     element.layer.getStage().on('click', (e) => {
         if (!element.drawing) return;
@@ -296,6 +307,17 @@ const addDoubleGateInterfaceStrategy = element => {
 
         line.points(previewPoints);
         layer.draw();
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && element.drawing) {
+            // Cancelar el dibujo de la línea
+            element.drawing = false;
+            if (line) {
+                line.destroy();  // Eliminar la línea de la capa
+                layer.draw();    // Redibujar la capa
+            }
+        }
     });
 
 }
